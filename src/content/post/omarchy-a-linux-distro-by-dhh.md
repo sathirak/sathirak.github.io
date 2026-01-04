@@ -1,7 +1,7 @@
 ---
 title: "Omarchy, a Linux distro by DHH"
 description: "A brand new player for Linux desktop"
-publishDate: "2024-05-10"
+publishDate: "2024-10-05"
 tags: ["linux", "omarchy", "arch", "desktop", "hyprland"]
 ---
 
