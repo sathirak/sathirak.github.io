@@ -17,7 +17,7 @@ First of all, it only asked me like 5 questions, and within about 10 minutes the
 So basically, Omarchy is a distro based on Arch Linux. It uses Hyprland as the window manager, which means it focuses on a more keyboard-heavy workflow, and I think it's basically built **for developers who want to get work done**.
 Yeah, I emphasized that part because a lot of devs who use Linux seemingly use it because it's really fun to customize, but in reality, it's a mighty efficient system that can also be customized to a dev's needs.
 
-![Omarchy desktop screenshot](/content/omarchy-a-linux-distro-by-dhh/assets/1.png)
+![Omarchy desktop screenshot](/content/omarchy-a-linux-distro-by-dhh/1.png)
 
 ## Special Stuff
 
@@ -31,10 +31,10 @@ Linux has some obscure distros which feel unneeded, which is not the case with O
 - Excellent choice of Keybindings
 - Big company backing the distro maintenance (37Signals)
 
-![Omarchy app spotlight](/content/omarchy-a-linux-distro-by-dhh/assets/2.png)
+![Omarchy app spotlight](/content/omarchy-a-linux-distro-by-dhh/2.png)
 _App finder in Omarchy_
 
-![Omarchy installing rust](/content/omarchy-a-linux-distro-by-dhh/assets/3.png)
+![Omarchy installing rust](/content/omarchy-a-linux-distro-by-dhh/3.png)
 _Installing latest Rust compiler using the menu UI_
 
 ## Batteries Included?
