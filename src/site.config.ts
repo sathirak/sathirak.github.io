@@ -26,7 +26,6 @@ export const siteConfig: SiteConfig = {
 		- In the footer found in src/components/layout/Footer.astro L:12
 	*/
 	title: "Sathira's Grotto",
-	// ! Please remember to replace the following site property with your own domain, used in astro.config.ts
 	url: "https://sathirak.github.io/",
 };
 
@@ -39,14 +38,6 @@ export const menuLinks: { path: string; title: string }[] = [
 	{
 		path: "/about/",
 		title: "About",
-	},
-	{
-		path: "/posts/",
-		title: "Blog",
-	},
-	{
-		path: "/notes/",
-		title: "Notes",
 	},
 ];
 
