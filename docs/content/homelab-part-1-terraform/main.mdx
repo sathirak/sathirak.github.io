@@ -1,0 +1,214 @@
+import { Code } from "@mdx"
+
+export const metadata = {
+  slug: "homelab-part-1-terraform",
+  title: "Homelab Part 1, Terraform",
+  description: "How I setup terraform for my homelab on a Digital Ocean VPS",
+};
+ 
+
+I was watching a [Youtube video](https://youtu.be/8s0DWeHuEaw) and the guy in the video mentioned that, _"Every DevOps Engineer needs a Homelab"_.
+This is something I may agree with but, what did I know about Homelabs? So naturally, I accepted the challenge to create one.
+
+So to get started with, where I wanted to host it.
+
+
+## DigitalOcean
+
+Now, this debate sparked in my mind because when people hear Homelabs, they think, "oh a nice little server room inside your house".
+Well, I would love to have one of those, but I don't really _need_ one, so just a simple DigitalOcean Droplet will suffice for my needs.
+
+And the basic idea of what I want to generally accomplish is, I want to have a simple server that I can use to manage a kubernetes cluster and maintain it. 
+
+The primary motive is so I can learn how to debug production level issues and get to learn a lot more technologies.
+The secondary motive is to just have fun.
+
+FYI, I am a mere software engineer and I'm in my DevOps phase :)
+
+## Terraform
+
+So to get started, I used Terraform to set up the whole thing so I can use nginx and stuff like that.
+In this blog, we'll try to simply show an HTML page on the server. Nothing more.
+
+Let's first start with Terraform.
+
+- [Terrafrom Guide on DigitalOcean](https://docs.digitalocean.com/reference/terraform/getting-started/)
+- [Terraform DigitalOcean Providers](https://registry.terraform.io/browse/providers)
+
+Above are a few guides that I found useful. You can use them or not. Just be aware my method of learning is trial and error (basically bruteforcing until everything works correctly), I read the documentation afterwards.
+
+First things first, created a [Github Repo](https://github.com/sathirak/homelab) to upload all my files regarding the Homelab.
+
+Step two, creating the terraform files.
+
+A simple provider.tf configures what our Infrastucture provider is and the general Terraform configuration.
+This is my second time using Terraform, so some of them might still not be optimized.
+
+
+<Code lang="terraform" file="provider.tf" code={`
+terraform {
+  required_providers {
+    digitalocean = {
+      source = "digitalocean/digitalocean"
+      version = "~> 2.0"
+    }
+  }
+}
+
+variable "do_token" {}
+variable "pvt_key" {}
+
+provider "digitalocean" {
+  token = var.do_token
+}
+
+data "digitalocean_ssh_key" "terraform" {
+  name = "id_rsa bigchungus"
+} 
+`}/>
+
+and next a **homelab.tf** file to specify what and where our droplet is.
+
+<Code lang="terraform" file="homelab.tf" code={`
+resource "digitalocean_droplet" "homelab" {
+  image = "ubuntu-22-04-x64"
+  name = "turbochungus"
+  region = "nyc2"
+  size = "s-1vcpu-1gb"
+  ssh_keys = [
+    data.digitalocean_ssh_key.terraform.id
+  ]
+  connection {
+    host = self.ipv4_address
+    user = "root"
+    type = "ssh"
+    private_key = file(var.pvt_key)
+    timeout = "2m"
+  }
+}
+`}/>
+
+Now then you'll need a DigitalOcean API key and an SSH key configured into your account,
+My SSH key is named id_rsa bigchungus and I have a DigitalOcean API key generated, which is a secret.
+
+Now you need to get terraform installed. [This is the official guide](https://developer.hashicorp.com/terraform/install)
+
+And then you need to run a few commands and you'll have a server up and running.
+
+<Code lang="bash" code={`
+terraform init
+
+terraform plan -out=infra.out
+
+terraform apply infra.out
+`}/>
+
+While executing it will ask for the DigitalOcean API key and the SSH key path.
+
+And after a few seconds your server will be up and running.
+
+Next we'll have to install ngnix. My plan is to display a simple html page on the server.
+
+First we'll need to access the server,
+
+So I SSHed into the server and installed ngnix.
+
+<Code lang="bash" code={`
+sudo apt update
+sudo apt install -y nginx
+`}/>
+
+Then after the ngnix server is restarted, I went to /var/www/html/ and added my static html file.
+
+<Code lang="bash" code={`
+cd /var/www/html
+touch index.html
+sudo nano index.html
+`}/>
+
+You can make the HTML file however you want, you can get it via git, or copy and paster it, whaterver you want.
+
+Now we need to check and fix some permissions.
+
+<Code lang="bash" code={`
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 755 /var/www/html
+`}/>
+
+Basically what this does is, it changes the owner of the directory to the ngnix user and gives the user read, write and execute permissions.
+
+Then get the default ngnix configuration
+
+<Code lang="bash" code={`
+sudo nano /etc/nginx/sites-available/default
+`}/>
+
+Make sure it's somewhat like the configuration below:
+
+<Code lang="nginx" code={`
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html;
+
+    server_name _;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+`}/>
+
+Then test and restart the ngnix server
+
+<Code lang="bash" code={`
+sudo nginx -t
+sudo systemctl restart nginx
+`}/>
+
+Now if I go to the Server's IP address, I can see the static site. Yay!
+
+## Automation
+
+But a big part of why I'm learning this is so I can automate it, so let's automate this whole thing in Terraform by changing the homelab.tf file.
+
+<Code lang="terraform" file="homelab.tf" code={`
+resource "digitalocean_droplet" "homelab" {
+  image = "ubuntu-22-04-x64"
+  name = "turbochungus"
+  region = "sfo3"
+  size = "s-1vcpu-1gb"
+  ssh_keys = [
+    data.digitalocean_ssh_key.terraform.id
+  ]
+
+  connection {
+    host        = self.ipv4_address
+    user        = "root"
+    type        = "ssh"
+    private_key = file(var.pvt_key)
+    timeout     = "2m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "apt-get update -y",
+      "apt-get install -y nginx",
+      
+      "git clone https://github.com/sathirak/homelab.git",
+
+      "rm -rf /var/www/html/*",
+      "cp ./homelab/nginx/* /var/www/html/",
+
+      "rm -rf ./homelab",
+      "systemctl restart nginx"
+    ]
+  }
+}
+`}/>
+
+The whole setting up thing will be automated now.
+
+If you want to try out the thing, the whole thing is in the git repo, feel free to clone it and run with your own config

@@ -1,0 +1,79 @@
+import { Code } from "@mdx"
+
+export const metadata = {
+    slug: "healthcheck-everything-using-pulsebridge",
+    title: "Healthcheck Everything with PulseBridge",
+};
+
+A few months ago, I built [Pulse Bridge](https://github.com/wavezync/pulse-bridge) with my team. Why? Well... we at [WaveZync](https://wavezync.com) needed a way to monitor a LOT of databases in a very simple way. It sounds simple, and as a matter of fact, it is simple. What we do is simply set a configuration for each service we need in a YAML file and then run the pulse-bridge container. It will start and keep monitoring our DBs, applications, and other services.
+
+In a general sense, Pulse Bridge is not something we need in the context of something like Kubernetes and Prometheus because they have better ways to monitor applications. But imagine an instance where we need to host many databases of different types, and these databases need to be health-checked in different ways (imagine running a query to check if a specific row exists). That's where Pulse Bridge comes in.
+
+It can monitor databases like MySQL, PostgreSQL, Redis, MSSQL,
+or applications using HTTP, HTTPS.
+
+<Code lang="yml" file="config.yml" code={`
+monitors:
+  # HTTP service monitoring
+  - name: "HTTP Service"
+    type: "http"
+    interval: "30s"
+    timeout: "5s"
+    http:
+      url: "http://helloworld-http:8080/ping"
+      method: "GET"
+      headers: # You can add custom headers too
+        Authorization: "Bearer secret-token" 
+        Content-Type: "application/json"
+
+  # Postgres monitoring
+  - name: "PostgreSQL Service"
+    type: "database"
+    interval: "30s"
+    timeout: "10s"
+    database:
+      driver: "postgres"
+      connection_string: "postgres://postgres:postgres@postgres-db:5432/monitoring" # You can use configuration params too.
+      query: "SELECT secret FROM secrets WHERE name='pulsebridge';" # Optional query to run for health check
+`}/>
+
+You can set up specific intervals, timeouts, and even custom queries to run to check if the database is healthy. If the query fails or the database does not respond in time, it will be marked as unhealthy.
+
+To see the status of your service, we have an endpoint on Pulse Bridge, `/monitor/services`
+
+<Code lang="json" file="response.json" code={`
+[
+    {
+        "service": "HTTP Service",
+        "status": "healthy",
+        "type": "http",
+        "last_check": "2025-07-24 11:56:01.918452021 +0000 UTC m=+0.357002662",
+        "last_success": "2025-07-24 11:56:01.918443897 +0000 UTC m=+0.356994537",
+        "metrics": {
+        "response_time_ms": 81,
+        "check_interval": "30s",
+        "consecutive_successes": 1
+        },
+        "last_error": ""
+    },
+    {
+        "service": "PostgreSQL Service",
+        "status": "unhealthy",
+        "type": "database",
+        "last_check": "2025-07-24 11:56:01.891732112 +0000 UTC m=+0.330282750",
+        "last_success": "",
+        "metrics": {
+        "response_time_ms": 50,
+        "check_interval": "30s",
+        "consecutive_successes": 0
+        },
+        "last_error": "failed to ping database: dial tcp 172.23.0.3:5432: connect: connection refused"
+    }
+ ]
+`}/>
+
+You can see the status of each service, when was the last time it was checked, when was the last time it was successful, and if there were any errors. 
+
+Now you can set this up for any kind of status page you want. For example, you can build a status page and get this attached as well. 
+
+Basically, this is what Pulse Bridge is for. It's simple, yet it's very effective. And the best part is, it's open source. You can find the code on [GitHub](https://github.com/wavezync/pulse-bridge), check it out, and contribute!
