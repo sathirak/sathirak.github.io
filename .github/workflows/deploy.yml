@@ -12,11 +12,8 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,13 +36,3 @@ jobs:
 
       - name: Build with Next.js
         run: pnpm build
-
-      - name: Configure git
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-
-      - name: Commit and push docs
-        run: |
-          git add docs/
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update static build [skip ci]" && git push)

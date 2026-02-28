@@ -3,7 +3,6 @@ import { Code } from "@mdx"
 export const metadata = {
     slug: "healthcheck-everything-using-pulsebridge",
     title: "Healthcheck Everything with PulseBridge",
-    date: "2025-12-15",
 };
 
 A few months ago, I built [Pulse Bridge](https://github.com/wavezync/pulse-bridge) with my team. Why? Well... we at [WaveZync](https://wavezync.com) needed a way to monitor a LOT of databases in a very simple way. It sounds simple, and as a matter of fact, it is simple. What we do is simply set a configuration for each service we need in a YAML file and then run the pulse-bridge container. It will start and keep monitoring our DBs, applications, and other services.
