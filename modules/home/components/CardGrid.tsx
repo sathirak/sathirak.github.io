@@ -1,49 +1,49 @@
 import { Card } from "@/modules/home/components/Card";
+import { getAllBlogPosts } from "@/lib/blog";
+import fs from "fs";
+import path from "path";
 
-export const CardGrid = () => {
-	const cardData = [
-		{
-			title: "Omarchy, a Linux distro by DHH",
-			date: new Date("2025-09-26T20:26:00"),
-			readTime: "5 min read",
-			slug: "omarchy-a-linux-distro-by-dhh",
+/**
+ * Estimate reading time based on word count
+ * Assumes ~200 words per minute
+ */
+function estimateReadTime(content: string): string {
+	const wordCount = content.split(/\s+/).length;
+	const minutes = Math.ceil(wordCount / 200);
+	return `${minutes} min read`;
+}
+
+export const CardGrid = async () => {
+	const posts = await getAllBlogPosts();
+	const contentDir = path.join(process.cwd(), "public/content");
+
+	const cardData = posts.map((post) => {
+		// Read the MDX file to estimate read time
+		const mdxPath = path.join(contentDir, post.slug, "main.mdx");
+		let readTime = "5 min read"; // default
+
+		try {
+			const content = fs.readFileSync(mdxPath, "utf-8");
+			readTime = estimateReadTime(content);
+		} catch {
+			// fallback to default if file can't be read
+		}
+
+		return {
+			title: post.title,
+			date: post.date,
+			readTime,
+			slug: post.slug,
 			image: {
-				alt: "Homelab Static image",
+				alt: `${post.title} cover image`,
 			},
-		},
-		{
-			title: "Healthcheck Everything, Everywhere, All at Once with PulseBridge",
-			date: new Date("2025-09-14T20:26:00"),
-			readTime: "2 min read",
-			slug: "healthcheck-everything-using-pulsebridge",
-			image: {
-				alt: "Homelab Static image",
-			},
-		},
-		{
-			title: "Homelab Part 2, Kubernetes",
-			date: new Date("2025-01-15"),
-			readTime: "5 min read",
-			slug: "homelab-part-2-kubernetes",
-			image: {
-				alt: "ArgoCD login page",
-			},
-		},
-		{
-			title: "Homelab Part 1, Terraform",
-			date: new Date("2025-01-13"),
-			readTime: "5 min read",
-			slug: "homelab-part-1-terraform",
-			image: {
-				alt: "Homelab Static image",
-			},
-		},
-	];
+		};
+	});
 
 	return (
 		<section className="w-full lg:w-3/4 grid grid-cols-1 gap-4 sm:gap-6 md:gap-8 lg:gap-10 sm:grid-cols-2 xl:grid-cols-3 my-8 sm:my-12 px-4 sm:px-0">
 			{cardData.map((card) => (
-				<Card key={card.title} {...card} />
+				<Card key={card.slug} {...card} />
 			))}
 		</section>
 	);

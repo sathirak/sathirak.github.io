@@ -1,4 +1,3 @@
-"use client"
 import { CardGrid } from "@/modules/home/components/CardGrid";
 
 export const Home = () => {
