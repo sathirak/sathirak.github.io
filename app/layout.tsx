@@ -25,6 +25,10 @@ export default function RootLayout({
 					href="/favicon/apple-touch-icon.png"
 				/>
 				<link rel="manifest" href="/favicon/site.webmanifest" />
+				<link
+					rel="stylesheet"
+					href="https://cdn.jsdelivr.net/npm/katex@0.16.33/dist/katex.min.css"
+				/>
 			</head>
 			<GoogleTagManager gtmId="G-EVEP2QMLHF" />
 			<body
