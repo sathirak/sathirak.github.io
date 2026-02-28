@@ -1,16 +1,13 @@
 import { Devlog } from "@/modules/devlog/pages/Devlog";
+import { getPublishedSlugs } from "@/lib/blog";
 import type { Metadata, ResolvingMetadata } from "next/types";
 
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-	// List of your blog post slugs
-	return [
-		{ slug: 'healthcheck-everything-using-pulsebridge' },
-		{ slug: 'omarchy-a-linux-distro-by-dhh' },
-		{ slug: 'homelab-part-1-terraform' },
-		{ slug: 'homelab-part-2-kubernetes' },
-	];
+	// Automatically discover all blog posts from public/content/
+	const slugs = await getPublishedSlugs();
+	return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata(
