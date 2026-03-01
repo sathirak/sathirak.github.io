@@ -1,0 +1,592 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Sathira's Grotto</title>
+    <link>https://sathirak.com</link>
+    <atom:link href="https://sathirak.com/feed.xml" rel="self" type="application/rss+xml" />
+    <description>Stories about life and engineering</description>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 01 Mar 2026 09:19:14 GMT</lastBuildDate>
+
+    <item>
+      <title>Trits, instead of Bits</title>
+      <link>https://sathirak.com/devlog/trits-instead-of-bits/</link>
+      <guid>https://sathirak.com/devlog/trits-instead-of-bits/</guid>
+      <pubDate>Sun, 01 Mar 2026 00:00:00 GMT</pubDate>
+      <description><![CDATA[import { Table, THead, TBody, TR, TH, TD } from &quot;@/modules/mdx/inline/table&quot;;
+
+&lt;Abstract&gt;
+This experiment explores ternary computing through the implementation of a balanced ternary CPU emulator, the Eris BST-27i. By replacing binary logic with balanced ternary $\{-1, 0, 1\}$, we demonstrate that ternary architectures offer significant advantages in information density, dynamic range, and inherent support for signed integers without additional sign bits. We analyze the architectural implications of ternary systems, including register design, address space organization, and ALU implementation, and present a quantitative comparison with the RV32I RISC-V architecture.
+
+[https://github.com/sathirak/eris-bst-27i](https://github.com/sathirak/eris-bst-27i)
+&lt;/Abstract&gt;
+
+Bits have been the foundation of computing since its inception. They&apos;re elegant in their simplicity: $0\text{V}$ for logical $0$ and $\sim3.3\text{V}$ for logical $1$. This binary representation propagates through wires, integrates into logical circuits, and operates within doped silicon. But what if we expanded to $3$, $4$, or even $5$ voltage levels instead of just $2$? What would fundamentally change?
+
+## Introduction to Trits
+
+Trits have not been extensively explored in computing research. There&apos;s minimal documentation and very few studies focusing on ternary computing. The reasoning is simple: we have more than 80 years of binary computer architecture, and we&apos;re not comfortable moving away from it.
+
+Yet studies have been done regardless. For example, the **Setun** from 67 years ago—a [computer based on trits](https://en.wikipedia.org/wiki/Setun). However, it was not widely adopted afterward.
+
+## Balanced Ternary
+
+For [this experiment](https://github.com/sathirak/eris-bst-27i), I used a **balanced trit** system. Instead of using $(0,1)$ like in binary or $(0,1,2)$ in standard ternary, I used $(-1, 0, 1)$, or more commonly notated as $(T, 0, 1)$ where $T$ represents &quot;trit negative&quot;.
+
+This balanced representation has interesting mathematical properties that make certain operations more elegant than in binary.
+
+## The Experiment
+
+The [Eris BST-27i project](https://github.com/sathirak/eris-bst-27i) demonstrates a ternary CPU emulator in practice.
+
+The experiment&apos;s goal was to create a complex CPU emulator comprising all the notable components:
+
+- **Control Unit (CU)**
+- **Arithmetic Logic Unit (ALU)**
+- **Address space**
+- **Registers**
+
+All built on the foundation of the balanced trit.
+
+Changing the foundation of computing means we need to go deeper—precisely to the CPU level. Imagine that we&apos;ve figured out a way to store and pass trits through our CPU. But nearly everything in a CPU depends on bits:
+
+- **Registers** - How do we store ternary values?
+- **Memory** - What does addressing look like in base-3?
+- **ALU** - How do arithmetic operations work?
+- **Instruction Set** - How do we encode operations?
+
+## Defining the Tryte
+
+This experimental CPU uses an architecture similar to RISC-V, specifically the RV32I, and we need to define a **tryte** for the CPU. Since the tryte has been defined in many different ways, I chose the most consistent representation: **27 trits per tryte**.
+
+This choice maintains consistency with the power-of-base pattern:
+
+- Binary: $2^3 = 8$ bits per byte
+- Ternary: $3^3 = 27$ trits per tryte
+
+## Defining Components
+
+**General Purpose Registers**: The ternary system uses 27 GPRs (3³) instead of the standard 32 found in RV32I. See the [register implementation](https://github.com/sathirak/eris-bst-27i/blob/main/src/core/registers.rs) for details.
+
+**Address Space**: The system is tryte-addressable, with each address storing a tryte in memory. This yields approximately 7.6 trillion distinct addresses, compared to 4 billion in 32-bit systems. Refer to the [address space implementation](https://github.com/sathirak/eris-bst-27i/blob/main/src/core/address_space.rs).
+
+**Instruction Set**: The ISA follows the RV32I RISC-V pattern, ensuring consistency with established processor design principles. See the [instruction set implementation](https://github.com/sathirak/eris-bst-27i/blob/main/src/arch/instructions.rs) for complete details.
+
+## The ALU
+
+Apart from other components that were completely redesigned from scratch, the ALU required a full reimplementation. The only surviving elements are its name and overall control flow.
+
+The ternary ALU requires fewer circuits than its binary counterpart. In the Eris BST-27i, we only needed:
+
+- A `min` circuit (for minimum/comparison operations)
+- A `full trit adder`
+
+In contrast, binary architectures require `and`, `or`, `add`, `sub`, and many other gates. This is one of the elegant aspects of ternary computing: the reduced complexity in fundamental operations makes the architecture simpler to understand and reason about.
+
+You can compare the Eris BST-27i implementation with the [RISC-V emulator](https://github.com/sathirak/risc-v-emu), which uses the same RV32I architecture. Though coding styles may differ, the architectural patterns remain consistent, enabling direct comparison of ternary versus binary design choices.
+
+## Comparative Analysis
+
+The following table summarizes key architectural metrics:
+
+&lt;Table&gt;
+  &lt;THead&gt;
+    &lt;TR&gt;
+      &lt;TH&gt;Feature&lt;/TH&gt;
+      &lt;TH&gt;Eris BST-27i (Ternary)&lt;/TH&gt;
+      &lt;TH&gt;RV32I (Binary)&lt;/TH&gt;
+    &lt;/TR&gt;
+  &lt;/THead&gt;
+  &lt;TBody&gt;
+    &lt;TR&gt;
+      &lt;TD&gt;Logic&lt;/TD&gt;
+      &lt;TD&gt;Balanced Ternary: {&apos;{-1, 0, 1}&apos;}&lt;/TD&gt;
+      &lt;TD&gt;Binary: {&apos;{0, 1}&apos;}&lt;/TD&gt;
+    &lt;/TR&gt;
+    &lt;TR&gt;
+      &lt;TD&gt;Word Width&lt;/TD&gt;
+      &lt;TD&gt;27 Trits&lt;/TD&gt;
+      &lt;TD&gt;32 Bits&lt;/TD&gt;
+    &lt;/TR&gt;
+    &lt;TR&gt;
+      &lt;TD&gt;GPR Count&lt;/TD&gt;
+      &lt;TD&gt;27 General Purpose Registers&lt;/TD&gt;
+      &lt;TD&gt;32 Registers&lt;/TD&gt;
+    &lt;/TR&gt;
+    &lt;TR&gt;
+      &lt;TD&gt;States per Word&lt;/TD&gt;
+      &lt;TD&gt;$3^{{27}}$ ≈ 7.6 × 10&lt;sup&gt;12&lt;/sup&gt;&lt;/TD&gt;
+      &lt;TD&gt;$2^{{32}}$ ≈ 4.3 × 10&lt;sup&gt;9&lt;/sup&gt;&lt;/TD&gt;
+    &lt;/TR&gt;
+    &lt;TR&gt;
+      &lt;TD&gt;Dynamic Range&lt;/TD&gt;
+      &lt;TD&gt;±3,812,798,742,493&lt;/TD&gt;
+      &lt;TD&gt;±2,147,483,648&lt;/TD&gt;
+    &lt;/TR&gt;
+    &lt;TR&gt;
+      &lt;TD&gt;Address Space&lt;/TD&gt;
+      &lt;TD&gt;7.6 TB (Trit-addressable)&lt;/TD&gt;
+      &lt;TD&gt;4 GB (Byte-addressable)&lt;/TD&gt;
+    &lt;/TR&gt;
+    &lt;TR&gt;
+      &lt;TD&gt;Memory Ratio&lt;/TD&gt;
+      &lt;TD colSpan={2}&gt;≈ 1,789× larger address space&lt;/TD&gt;
+    &lt;/TR&gt;
+  &lt;/TBody&gt;
+&lt;/Table&gt;
+
+## Advantages of Ternary Computing
+
+### Native Signed Integer Support
+
+Balanced ternary naturally represents negative integers without requiring separate sign bits or two&apos;s complement encoding. This simplifies arithmetic logic and reduces circuit complexity compared to binary systems.
+
+### Information Density
+
+A single trit carries $\log_2(3) \approx 1.585$ bits of information, providing approximately 58.5% more information density per unit than binary logic. Over $n$ positions, ternary systems represent $3^n$ states versus binary&apos;s $2^n$ states.
+
+### Extended Dynamic Range
+
+With balanced ternary representation using 27 trits, the dynamic range is $\pm 3,812,798,742,493$, approximately **1,776 times** greater than RV32I&apos;s $\pm 2,147,483,648$, despite using only a marginally smaller word width ($27$ trits vs $32$ bits).
+
+### Massive Address Space
+
+The address space of $3^{27}$ addresses provides approximately **1,789 times** more addressable memory than a 32-bit system ($7.6$ TB vs $4$ GB), enabling access to vastly larger datasets without address translation mechanisms.
+
+### Simplified ALU Design
+
+Ternary ALUs require fewer fundamental gates. The Eris BST-27i uses only a `min` circuit and a `full trit adder`, whereas binary ALUs require `and`, `or`, `add`, `subtract`, and numerous other gates. This reduction directly translates to lower silicon area, reduced power consumption, and fewer potential failure points.]]></description>
+    </item>
+
+    <item>
+      <title>Healthcheck Everything with PulseBridge</title>
+      <link>https://sathirak.com/devlog/healthcheck-everything-using-pulsebridge/</link>
+      <guid>https://sathirak.com/devlog/healthcheck-everything-using-pulsebridge/</guid>
+      <pubDate>Mon, 15 Dec 2025 00:00:00 GMT</pubDate>
+      <description><![CDATA[A few months ago, I built [Pulse Bridge](https://github.com/wavezync/pulse-bridge) with my team. Why? Well... we at [WaveZync](https://wavezync.com) needed a way to monitor a LOT of databases in a very simple way. It sounds simple, and as a matter of fact, it is simple. What we do is simply set a configuration for each service we need in a YAML file and then run the pulse-bridge container. It will start and keep monitoring our DBs, applications, and other services.
+
+In a general sense, Pulse Bridge is not something we need in the context of something like Kubernetes and Prometheus because they have better ways to monitor applications. But imagine an instance where we need to host many databases of different types, and these databases need to be health-checked in different ways (imagine running a query to check if a specific row exists). That&apos;s where Pulse Bridge comes in.
+
+It can monitor databases like MySQL, PostgreSQL, Redis, MSSQL,
+or applications using HTTP, HTTPS.
+
+&lt;Code lang=&quot;yml&quot; file=&quot;config.yml&quot; code={`
+monitors:
+  # HTTP service monitoring
+  - name: &quot;HTTP Service&quot;
+    type: &quot;http&quot;
+    interval: &quot;30s&quot;
+    timeout: &quot;5s&quot;
+    http:
+      url: &quot;http://helloworld-http:8080/ping&quot;
+      method: &quot;GET&quot;
+      headers: # You can add custom headers too
+        Authorization: &quot;Bearer secret-token&quot; 
+        Content-Type: &quot;application/json&quot;
+
+  # Postgres monitoring
+  - name: &quot;PostgreSQL Service&quot;
+    type: &quot;database&quot;
+    interval: &quot;30s&quot;
+    timeout: &quot;10s&quot;
+    database:
+      driver: &quot;postgres&quot;
+      connection_string: &quot;postgres://postgres:postgres@postgres-db:5432/monitoring&quot; # You can use configuration params too.
+      query: &quot;SELECT secret FROM secrets WHERE name=&apos;pulsebridge&apos;;&quot; # Optional query to run for health check
+`}/&gt;
+
+You can set up specific intervals, timeouts, and even custom queries to run to check if the database is healthy. If the query fails or the database does not respond in time, it will be marked as unhealthy.
+
+To see the status of your service, we have an endpoint on Pulse Bridge, `/monitor/services`
+
+&lt;Code lang=&quot;json&quot; file=&quot;response.json&quot; code={`
+[
+    {
+        &quot;service&quot;: &quot;HTTP Service&quot;,
+        &quot;status&quot;: &quot;healthy&quot;,
+        &quot;type&quot;: &quot;http&quot;,
+        &quot;last_check&quot;: &quot;2025-07-24 11:56:01.918452021 +0000 UTC m=+0.357002662&quot;,
+        &quot;last_success&quot;: &quot;2025-07-24 11:56:01.918443897 +0000 UTC m=+0.356994537&quot;,
+        &quot;metrics&quot;: {
+        &quot;response_time_ms&quot;: 81,
+        &quot;check_interval&quot;: &quot;30s&quot;,
+        &quot;consecutive_successes&quot;: 1
+        },
+        &quot;last_error&quot;: &quot;&quot;
+    },
+    {
+        &quot;service&quot;: &quot;PostgreSQL Service&quot;,
+        &quot;status&quot;: &quot;unhealthy&quot;,
+        &quot;type&quot;: &quot;database&quot;,
+        &quot;last_check&quot;: &quot;2025-07-24 11:56:01.891732112 +0000 UTC m=+0.330282750&quot;,
+        &quot;last_success&quot;: &quot;&quot;,
+        &quot;metrics&quot;: {
+        &quot;response_time_ms&quot;: 50,
+        &quot;check_interval&quot;: &quot;30s&quot;,
+        &quot;consecutive_successes&quot;: 0
+        },
+        &quot;last_error&quot;: &quot;failed to ping database: dial tcp 172.23.0.3:5432: connect: connection refused&quot;
+    }
+ ]
+`}/&gt;
+
+You can see the status of each service, when was the last time it was checked, when was the last time it was successful, and if there were any errors. 
+
+Now you can set this up for any kind of status page you want. For example, you can build a status page and get this attached as well. 
+
+Basically, this is what Pulse Bridge is for. It&apos;s simple, yet it&apos;s very effective. And the best part is, it&apos;s open source. You can find the code on [GitHub](https://github.com/wavezync/pulse-bridge), check it out, and contribute!]]></description>
+    </item>
+
+    <item>
+      <title>Omarchy,a Linux distro by DHH</title>
+      <link>https://sathirak.com/devlog/omarchy-a-linux-distro-by-dhh/</link>
+      <guid>https://sathirak.com/devlog/omarchy-a-linux-distro-by-dhh/</guid>
+      <pubDate>Sat, 20 Sep 2025 00:00:00 GMT</pubDate>
+      <description><![CDATA[A few days ago, I was talking to one of my friends about what distro I should hop next to. I have only used Debian and so far good&apos;ol Debbie has been excellent at what it does. 
+But seemingly there were newer features in Linux and I wanted to check them out too. And just a day after [DHH](https://www.linkedin.com/in/david-heinemeier-hansson-374b18221/), the guy who made Ruby on Rails and many other cool things, released [Omarchy 2.0](https://omarchy.org/)
+
+### First Impressions
+
+After using it for maybe two days, I can tell you this Omarchy is a very, very different distro. Needless to say, it&apos;s my new daily driver.
+
+First of all, it only asked me like 5 questions, and within about 10 minutes the whole OS was done, compared to the stress I had when installing Debian (I tore out my hair once because of the installation time) this was nothing.
+
+So basically, Omarchy is a distro based on Arch Linux. It uses Hyprland as the window manager, which means it focuses on a more keyboard-heavy workflow, and I think it&apos;s basically built **for developers who want to get work done**. 
+Yeah, I emphasized that part because a lot of devs who use Linux seemingly use it because it&apos;s really fun to customize, but in reality, it&apos;s a mighty efficient system that can also be customized to a dev&apos;s needs.
+
+![Omarchy desktop screenshot](/content/omarchy-a-linux-distro-by-dhh/assets/1.png)
+
+### Special Stuff
+Linux has some obscure distros which feel unneeded, which is not the case with Omarchy, it has a lot of new stuff dedicated for a dev.
+
+- Prebuilt development environments (Go, Rust...)
+- A simple central menu that handles everything
+- TUIs with prebuilt themes, fonts, backgrounds, and very nice screensavers
+- Pre-installed software that&apos;s usually needed by anyone (Alacritty, Discord, OBS Studio...)
+- Many CLIs have been preinstalled (gh, zoxide...)
+- Excellent choice of Keybindings
+- Big company backing the distro maintenance (37Signals)
+
+![Omarchy app spotlight](/content/omarchy-a-linux-distro-by-dhh/assets/2.png)
+App finder in Omarchy
+
+![Omarchy installing rust](/content/omarchy-a-linux-distro-by-dhh/assets/3.png)
+Installing latest Rust compiler using the menu UI
+
+### Batteries Included?
+
+Now, most Linux ISO images are ~1GB or less, and Arch Linux is one of the lightest among them. But in the case of Omarchy, the image is ~7GB. The OS is full of software, not necessarily bloatware. I can vouch for this because Omarchy has set up many utilities that I need as a developer beforehand. It has `mise`, `neovim` (which I think should be the standard editor, BTW), and even stuff like Steam and Spotify (both essential for development).
+
+But an OS like this is bound to have many, many issues, especially UI-related stuff, but so far the only issue I have is having those default GNOME windows for Bluetooth and some other things. I think they&apos;ll probably be replaced soon, but that&apos;s okay for now.
+
+One of the main things that you&apos;ll notice about this OS is its very opinionated way of getting work done. It has its own menu, its own UIs, and even setting up developer environments for languages is done in a specific way. This begs the question... what if we don&apos;t like that? Like, what if I don&apos;t like using `mise` for installing NodeJS? Well, it&apos;s Arch Linux at its core, so you can use your terminal and get things done easily.
+
+So far, those are the things that I have seen, and I can say that this is a beginner-friendly Linux distro. It&apos;s gonna have a bright future.]]></description>
+    </item>
+
+    <item>
+      <title>Homelab Part 2, Kubernetes</title>
+      <link>https://sathirak.com/devlog/homelab-part-2-kubernetes/</link>
+      <guid>https://sathirak.com/devlog/homelab-part-2-kubernetes/</guid>
+      <pubDate>Tue, 10 Jun 2025 00:00:00 GMT</pubDate>
+      <description><![CDATA[In the last part of the Homelab series, we configured Terraform so our VPS can effectively be spawned and despawned via commands.
+Now we need to configure our homelab so we can use it to deploy and test applications. Basically, we need to run Kubernetes on our server.
+
+## Many types of Kubernetes
+
+There are six main ways to run Kubernetes on a server (IDK there might be more):
+
+[Talos](https://www.talos.dev/) - Basically a fully fledged Linux distro made for Kubernetes, communication is done via an API, hence minimal, secure and production grade.
+
+[Kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/) - Made by Kubernetes themselves, no out-of-the-box experience, needs setup and is hard to manage.
+
+[K3s](https://k3s.io/) - Optimized, constrained mini K8s distribution, low production grade, easy to manage.
+
+[K0s](https://k0sproject.io/) - Production grade bare metal K8s distro, minimal and self-contained.
+
+[Minikube](https://minikube.sigs.k8s.io/docs/) - Used for locally testing and development
+
+[MicroK8s](https://microk8s.io/) - Made by the guys who made Ubuntu, based on snap and plugins, heavier resource use.
+
+## K3s
+
+There are many Kubernetes distributions, but for now we are going to use k3s.
+
+Why? It&apos;s easy to manage, has full Kubernetes API support, and can be used with Rancher ecosystems.
+
+However, ideally we want to use Talos, because it&apos;s production grade and we need to be able to debug production grade clusters.
+
+First of all, we&apos;ll need to edit our homelab.tf config to be able to download K3s.
+
+You can refer to this [Guide](https://www.digitalocean.com/community/tutorials/how-to-setup-k3s-kubernetes-cluster-on-ubuntu) if you need more info.
+
+Basically this command is enough for that.
+
+&lt;Code lang=&quot;bash&quot; code={`
+curl -sfL https://get.k3s.io | sh -
+sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+`}/&gt;
+
+## ArgoCD
+
+Now actually we have docker, kubectl and k3s installed. So we have a fully operational Kubernetes cluster waiting to be used.
+
+But we&apos;re not going to stop there, we&apos;ll also be installing ArgoCD.
+
+ArgoCD my beloved GitOps thingy. It makes a lot of things a lot more easier.
+
+Anywho, this requires a little bit of configuring. First in our Cluster we can make a new namespace and install argocd via its manifest
+
+&lt;Code lang=&quot;bash&quot; code={`
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+`}/&gt;
+
+Like so.
+
+Then we&apos;ll need to wait until all of the argocd pods are done and running
+&lt;Code lang=&quot;bash&quot; code={`
+kubectl wait --for=condition=Ready pods --all -n argocd --timeout=300s
+`}/&gt;
+
+Now ArgoCD is running in your Cluster, but the thing is we need to use the ArgoCD UI, but how?
+
+You see when running ArgoCD in local machines it&apos;s easy to get its UI from the browser, but in a VPS like this, we may need to expose the ArgoCD UI via a NodePort
+
+&lt;Code lang=&quot;bash&quot; code={`
+kubectl patch svc argocd-server -n argocd -p &apos;{&quot;spec&quot;: {&quot;type&quot;: &quot;NodePort&quot;}}&apos;
+`}/&gt;
+
+We can use the above command to patch the type of service to a NodePort, this exposes our ArgoCD UI via the VPS&apos;s IP address
+
+You can then use this command to get all the details about the exposed ArgoCD service
+
+&lt;Code lang=&quot;bash&quot; code={`
+kubectl get svc argocd-server -n argocd
+`}/&gt;
+
+You can access your ArgoCD UI using your IP address and the 443 mapped port number (let&apos;s assume it&apos;s 320001) like this: http://YOUR_IP_ADDRESS:320001
+
+You will also need the password for ArgoCD, which can be retrieved using the following command (note that it&apos;s base64 encoded):
+
+&lt;Code lang=&quot;bash&quot; code={`
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath=&quot;{.data.password}&quot; | base64 -d
+`}/&gt;
+
+And that&apos;s how I installed kubernetes and exposed ArgoCD UI in homelab.]]></description>
+    </item>
+
+    <item>
+      <title>Homelab Part 1, Terraform</title>
+      <link>https://sathirak.com/devlog/homelab-part-1-terraform/</link>
+      <guid>https://sathirak.com/devlog/homelab-part-1-terraform/</guid>
+      <pubDate>Wed, 05 Mar 2025 00:00:00 GMT</pubDate>
+      <description><![CDATA[I was watching a [Youtube video](https://youtu.be/8s0DWeHuEaw) and the guy in the video mentioned that, _&quot;Every DevOps Engineer needs a Homelab&quot;_.
+This is something I may agree with but, what did I know about Homelabs? So naturally, I accepted the challenge to create one.
+
+So to get started with, where I wanted to host it.
+
+
+## DigitalOcean
+
+Now, this debate sparked in my mind because when people hear Homelabs, they think, &quot;oh a nice little server room inside your house&quot;.
+Well, I would love to have one of those, but I don&apos;t really _need_ one, so just a simple DigitalOcean Droplet will suffice for my needs.
+
+And the basic idea of what I want to generally accomplish is, I want to have a simple server that I can use to manage a kubernetes cluster and maintain it. 
+
+The primary motive is so I can learn how to debug production level issues and get to learn a lot more technologies.
+The secondary motive is to just have fun.
+
+FYI, I am a mere software engineer and I&apos;m in my DevOps phase :)
+
+## Terraform
+
+So to get started, I used Terraform to set up the whole thing so I can use nginx and stuff like that.
+In this blog, we&apos;ll try to simply show an HTML page on the server. Nothing more.
+
+Let&apos;s first start with Terraform.
+
+- [Terrafrom Guide on DigitalOcean](https://docs.digitalocean.com/reference/terraform/getting-started/)
+- [Terraform DigitalOcean Providers](https://registry.terraform.io/browse/providers)
+
+Above are a few guides that I found useful. You can use them or not. Just be aware my method of learning is trial and error (basically bruteforcing until everything works correctly), I read the documentation afterwards.
+
+First things first, created a [Github Repo](https://github.com/sathirak/homelab) to upload all my files regarding the Homelab.
+
+Step two, creating the terraform files.
+
+A simple provider.tf configures what our Infrastucture provider is and the general Terraform configuration.
+This is my second time using Terraform, so some of them might still not be optimized.
+
+
+&lt;Code lang=&quot;terraform&quot; file=&quot;provider.tf&quot; code={`
+terraform {
+  required_providers {
+    digitalocean = {
+      source = &quot;digitalocean/digitalocean&quot;
+      version = &quot;~&gt; 2.0&quot;
+    }
+  }
+}
+
+variable &quot;do_token&quot; {}
+variable &quot;pvt_key&quot; {}
+
+provider &quot;digitalocean&quot; {
+  token = var.do_token
+}
+
+data &quot;digitalocean_ssh_key&quot; &quot;terraform&quot; {
+  name = &quot;id_rsa bigchungus&quot;
+} 
+`}/&gt;
+
+and next a **homelab.tf** file to specify what and where our droplet is.
+
+&lt;Code lang=&quot;terraform&quot; file=&quot;homelab.tf&quot; code={`
+resource &quot;digitalocean_droplet&quot; &quot;homelab&quot; {
+  image = &quot;ubuntu-22-04-x64&quot;
+  name = &quot;turbochungus&quot;
+  region = &quot;nyc2&quot;
+  size = &quot;s-1vcpu-1gb&quot;
+  ssh_keys = [
+    data.digitalocean_ssh_key.terraform.id
+  ]
+  connection {
+    host = self.ipv4_address
+    user = &quot;root&quot;
+    type = &quot;ssh&quot;
+    private_key = file(var.pvt_key)
+    timeout = &quot;2m&quot;
+  }
+}
+`}/&gt;
+
+Now then you&apos;ll need a DigitalOcean API key and an SSH key configured into your account,
+My SSH key is named id_rsa bigchungus and I have a DigitalOcean API key generated, which is a secret.
+
+Now you need to get terraform installed. [This is the official guide](https://developer.hashicorp.com/terraform/install)
+
+And then you need to run a few commands and you&apos;ll have a server up and running.
+
+&lt;Code lang=&quot;bash&quot; code={`
+terraform init
+
+terraform plan -out=infra.out
+
+terraform apply infra.out
+`}/&gt;
+
+While executing it will ask for the DigitalOcean API key and the SSH key path.
+
+And after a few seconds your server will be up and running.
+
+Next we&apos;ll have to install ngnix. My plan is to display a simple html page on the server.
+
+First we&apos;ll need to access the server,
+
+So I SSHed into the server and installed ngnix.
+
+&lt;Code lang=&quot;bash&quot; code={`
+sudo apt update
+sudo apt install -y nginx
+`}/&gt;
+
+Then after the ngnix server is restarted, I went to /var/www/html/ and added my static html file.
+
+&lt;Code lang=&quot;bash&quot; code={`
+cd /var/www/html
+touch index.html
+sudo nano index.html
+`}/&gt;
+
+You can make the HTML file however you want, you can get it via git, or copy and paster it, whaterver you want.
+
+Now we need to check and fix some permissions.
+
+&lt;Code lang=&quot;bash&quot; code={`
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 755 /var/www/html
+`}/&gt;
+
+Basically what this does is, it changes the owner of the directory to the ngnix user and gives the user read, write and execute permissions.
+
+Then get the default ngnix configuration
+
+&lt;Code lang=&quot;bash&quot; code={`
+sudo nano /etc/nginx/sites-available/default
+`}/&gt;
+
+Make sure it&apos;s somewhat like the configuration below:
+
+&lt;Code lang=&quot;nginx&quot; code={`
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html;
+
+    server_name _;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+`}/&gt;
+
+Then test and restart the ngnix server
+
+&lt;Code lang=&quot;bash&quot; code={`
+sudo nginx -t
+sudo systemctl restart nginx
+`}/&gt;
+
+Now if I go to the Server&apos;s IP address, I can see the static site. Yay!
+
+## Automation
+
+But a big part of why I&apos;m learning this is so I can automate it, so let&apos;s automate this whole thing in Terraform by changing the homelab.tf file.
+
+&lt;Code lang=&quot;terraform&quot; file=&quot;homelab.tf&quot; code={`
+resource &quot;digitalocean_droplet&quot; &quot;homelab&quot; {
+  image = &quot;ubuntu-22-04-x64&quot;
+  name = &quot;turbochungus&quot;
+  region = &quot;sfo3&quot;
+  size = &quot;s-1vcpu-1gb&quot;
+  ssh_keys = [
+    data.digitalocean_ssh_key.terraform.id
+  ]
+
+  connection {
+    host        = self.ipv4_address
+    user        = &quot;root&quot;
+    type        = &quot;ssh&quot;
+    private_key = file(var.pvt_key)
+    timeout     = &quot;2m&quot;
+  }
+
+  provisioner &quot;remote-exec&quot; {
+    inline = [
+      &quot;apt-get update -y&quot;,
+      &quot;apt-get install -y nginx&quot;,
+      
+      &quot;git clone https://github.com/sathirak/homelab.git&quot;,
+
+      &quot;rm -rf /var/www/html/*&quot;,
+      &quot;cp ./homelab/nginx/* /var/www/html/&quot;,
+
+      &quot;rm -rf ./homelab&quot;,
+      &quot;systemctl restart nginx&quot;
+    ]
+  }
+}
+`}/&gt;
+
+The whole setting up thing will be automated now.
+
+If you want to try out the thing, the whole thing is in the git repo, feel free to clone it and run with your own config]]></description>
+    </item>
+
+  </channel>
+</rss>
