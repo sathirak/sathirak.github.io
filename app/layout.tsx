@@ -1,6 +1,7 @@
 import { redHatMono } from "@/modules/layout/fonts";
 import "./globals.css";
 import { Header } from "@/modules/layout/components/Header";
+import { Footer } from "@/modules/layout/components/Footer";
 import { GoogleTagManager } from "@next/third-parties/google";
 
 export default function RootLayout({
@@ -32,10 +33,11 @@ export default function RootLayout({
 			</head>
 			<GoogleTagManager gtmId="G-EVEP2QMLHF" />
 			<body
-				className={`${redHatMono.className} w-full text-zinc-800 selection:bg-black selection:text-white`}
+				className={`${redHatMono.className} w-full text-zinc-800 selection:bg-black selection:text-white flex flex-col min-h-screen`}
 			>
 				<Header />
-				{children}
+				<div className="flex-grow">{children}</div>
+				<Footer />
 			</body>
 		</html>
 	);

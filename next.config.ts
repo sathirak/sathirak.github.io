@@ -18,6 +18,7 @@ const withMDX = createMDX({
   options: {
     remarkPlugins: [remarkMath],
     rehypePlugins: [rehypeKatex],
+    development: process.env.NODE_ENV === 'development',
   },
 });
 
