@@ -28,7 +28,7 @@ export default function BioPage() {
 								I am an Engineer specializing in Systems Engineering and DevOps.
 							</p>
 							<p className="mb-4">
-								Currently pursuing my undergraduate degree at SLIIT, my engineering 
+								Currently pursuing my undergraduate degree at SLIIT, Colombo, Sri Lanka, my engineering 
 								journey began early with server management and programming. This 
 								foundation has since evolved into a specialization in Computer 
 								Architecture and Infrastructure.

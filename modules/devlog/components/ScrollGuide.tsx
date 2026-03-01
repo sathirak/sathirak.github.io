@@ -95,7 +95,7 @@ export const ScrollGuide: React.FC = () => {
 	return (
 		<div
 			ref={guideRef}
-			className="fixed right-6 top-1/4 flex flex-col gap-3 z-50"
+			className="hidden lg:flex fixed right-6 top-1/4 flex-col gap-3 z-50"
 			style={{ pointerEvents: "auto" }}
 			data-active-index={activeIndex}
 		>
