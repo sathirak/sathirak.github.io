@@ -2,10 +2,12 @@ import type { TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from "re
 
 const cellStyle = {
 	border: '1px solid #d1d5db',
-	padding: '0.55rem 0.7rem',
+	padding: '0.5rem 0.6rem',
 	textAlign: 'left' as const,
 	verticalAlign: 'top' as const,
 	overflowWrap: 'anywhere' as const,
+	wordBreak: 'break-word' as const,
+	whiteSpace: 'normal' as const,
 };
 
 const headerCellStyle = {
@@ -22,8 +24,9 @@ export const Table = ({ children, ...props }: TableHTMLAttributes<HTMLTableEleme
 			style={{
 				borderCollapse: 'collapse',
 				width: '100%',
-				minWidth: '560px',
-				fontSize: '0.95rem',
+				maxWidth: '100%',
+				tableLayout: 'fixed',
+				fontSize: '0.88rem',
 			}}
 			{...props}
 		>
