@@ -84,18 +84,12 @@ export default async function Image({ params }: { params: { slug: string } }) {
 					fontFamily: "system-ui",
 					padding: "60px",
 					textAlign: "center",
+					fontSize: 48,
+					fontWeight: "bold",
+					lineHeight: 1.4,
 				}}
 			>
-				<div
-					style={{
-						fontSize: 56,
-						fontWeight: "bold",
-						lineHeight: 1.2,
-						maxWidth: "90%",
-					}}
-				>
-					{post.title} • {formattedDate} • {post.readingTimeMinutes} min read
-				</div>
+				{post.title} • {formattedDate} • {post.readingTimeMinutes} min read
 			</div>
 		),
 		{
