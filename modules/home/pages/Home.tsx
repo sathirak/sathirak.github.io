@@ -10,10 +10,7 @@ export const Home = () => {
 					Stories about life <br />
 					and engineering, by{" "}
 					<Link href="/bio" className="group">
-						<span
-							className="bg-gradient-to-r from-teal-500 via-orange-500 to-yellow-500 text-transparent bg-clip-text inline-block hover:opacity-80 transition-opacity cursor-pointer"
-							style={{ display: 'inline-block', whiteSpace: 'pre' }}
-						>
+					<span className="bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-tertiary text-transparent bg-clip-text inline-block whitespace-pre hover:opacity-80 transition-opacity cursor-pointer">
 							Sathira.
 						</span>
 					</Link>

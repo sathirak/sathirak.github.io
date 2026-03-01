@@ -22,7 +22,7 @@ export const Card = (data: Props) => {
 			<article className="flex flex-col gap-2 sm:gap-3" id={data.slug}>
 				<div className="relative overflow-hidden">
 					{isLoading && (
-						<div className="bg-gradient-to-r from-teal-100 via-orange-100 to-yellow-100 animate-pulse rounded-md aspect-video w-full" />
+						<div className="bg-gradient-to-r from-brand-primary-light via-brand-secondary-light to-brand-tertiary-light animate-pulse rounded-md aspect-video w-full" />
 					)}
 
 					<Image

@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+	:root {
+		/* Brand colors - synced with Tailwind theme */
+		--color-brand-primary: #14b8a6;
+		--color-brand-secondary: #f97316;
+		--color-brand-tertiary: #eab308;
+		
+		/* Scrollbar colors */
+		--color-scrollbar-track: #f1f1f1;
+		--color-scrollbar-thumb: #e0e0e0;
+		--color-scrollbar-thumb-hover: #d3d3d3;
+	}
+}
+
 html {
 	scroll-behavior: smooth;
 	scroll-padding-top: 76px;
@@ -12,17 +26,17 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-	background: #f1f1f1;
+	background: var(--color-scrollbar-track);
 	border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-	background: #e0e0e0;
+	background: var(--color-scrollbar-thumb);
 	border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	background: #d3d3d3;
+	background: var(--color-scrollbar-thumb-hover);
 }
 
 body {
@@ -36,7 +50,7 @@ body {
 	line-break: anywhere;
 }
 
-.shiki{
+.shiki {
 	overflow-wrap: break-word;
 	white-space: pre-wrap;
 	overflow: auto;

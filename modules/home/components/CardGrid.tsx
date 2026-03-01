@@ -1,5 +1,5 @@
 import { Card } from "@/modules/home/components/Card";
-import { getAllBlogPosts } from "@/lib/blog";
+import { getAllBlogPosts } from "@/modules/shared/utils/blog";
 import fs from "fs";
 import path from "path";
 

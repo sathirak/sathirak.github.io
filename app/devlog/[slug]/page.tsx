@@ -1,5 +1,5 @@
 import { Devlog } from "@/modules/devlog/pages/Devlog";
-import { getPublishedSlugs } from "@/lib/blog";
+import { getPublishedSlugs } from "@/modules/shared/utils/blog";
 import type { Metadata, ResolvingMetadata } from "next/types";
 
 export const dynamicParams = false;

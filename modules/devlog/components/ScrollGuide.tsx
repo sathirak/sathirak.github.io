@@ -82,13 +82,13 @@ export const ScrollGuide: React.FC = () => {
 			let targetColor = "#e5e7eb"; // gray-300
 			let targetScale = 1;
 			if (idx === activeIndex) {
-				targetColor = "#14b8a6"; // teal-500
+				targetColor = "#14b8a6"; // teal-500 (brand-primary)
 				targetScale = 1.1;
 			} else if (
 				Math.abs(idx - activeIndex) === 1 ||
 				Math.abs(idx - activeIndex) === 2
 			) {
-				targetColor = "#2dd4bf"; // teal-300
+				targetColor = "#2dd4bf"; // teal-400
 				targetScale = 1.05;
 			}
 			animate(bar, {

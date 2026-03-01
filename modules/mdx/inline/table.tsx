@@ -1,39 +1,17 @@
-import type { TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from "react";
+import type {
+	TableHTMLAttributes,
+	TdHTMLAttributes,
+	ThHTMLAttributes,
+} from "react";
 
-const cellStyle = {
-	border: '1px solid #d8d8d8f4',
-	padding: '0.5rem 0.6rem',
-	textAlign: 'left' as const,
-	verticalAlign: 'top' as const,
-	overflowWrap: 'anywhere' as const,
-	wordBreak: 'break-word' as const,
-	whiteSpace: 'normal' as const,
-	boxSizing: 'border-box' as const,
-};
-
-const headerCellStyle = {
-	...cellStyle,
-	fontWeight: '600' as const,
-};
-
-export const Table = ({ children, ...props }: TableHTMLAttributes<HTMLTableElement>) => (
-	<div
-		className="my-6 w-full min-w-0 overflow-hidden"
-		style={{ maxWidth: 'calc(100vw - 3rem)' }}
-	>
-		<div
-			className="w-full min-w-0 overflow-x-auto overflow-y-hidden"
-			style={{ WebkitOverflowScrolling: 'touch', maxWidth: '100%' }}
-		>
+export const Table = ({
+	children,
+	...props
+}: TableHTMLAttributes<HTMLTableElement>) => (
+	<div className="my-6 w-full min-w-0 overflow-hidden max-w-[calc(100vw-3rem)]">
+		<div className="w-full min-w-0 overflow-x-auto overflow-y-hidden max-w-full [overflow-scrolling:touch]">
 			<table
-				style={{
-					borderCollapse: 'collapse',
-					width: 'max-content',
-					minWidth: '100%',
-					maxWidth: '100%',
-					tableLayout: 'auto',
-					fontSize: '0.88rem',
-				}}
+				className="border-collapse w-max min-w-full max-w-full table-auto text-[0.88rem]"
 				{...props}
 			>
 				{children}
@@ -55,9 +33,15 @@ export const TR = (props: TableHTMLAttributes<HTMLTableRowElement>) => (
 );
 
 export const TH = (props: ThHTMLAttributes<HTMLTableHeaderCellElement>) => (
-	<th style={headerCellStyle} {...props} />
+	<th
+		className="border border-gray-300/[0.96] p-2 px-2.5 text-left align-top break-words whitespace-normal box-border font-semibold"
+		{...props}
+	/>
 );
 
 export const TD = (props: TdHTMLAttributes<HTMLTableCellElement>) => (
-	<td style={cellStyle} {...props} />
+	<td
+		className="border border-gray-300/[0.96] p-2 px-2.5 text-left align-top break-words whitespace-normal box-border"
+		{...props}
+	/>
 );
