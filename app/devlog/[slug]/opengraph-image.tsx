@@ -8,7 +8,9 @@ export const dynamic = "force-static";
 // Generate static params for all blog posts
 export async function generateStaticParams() {
 	const slugs = await getPublishedSlugs();
-	return slugs.map((slug) => ({ slug }));
+	return slugs.flatMap((slug) => [
+		{ slug, __metadata_id__: "og-image" }
+	]);
 }
 
 // Generate OG images for each blog post
