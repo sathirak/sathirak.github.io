@@ -1,0 +1,55 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build project
+        run: pnpm run build
+
+      - name: Checkout production branch
+        run: git fetch origin production 2>/dev/null || echo "Production branch does not exist yet"
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create or update production branch
+        run: |
+          git checkout --orphan production-temp
+          git rm -rf .
+          cp -r docs/* .
+          touch .nojekyll
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes to docs, skipping commit"
+          else
+            git commit -m "Build artifacts from main @ $(git rev-parse --short HEAD)"
+            git push origin production-temp:production --force
+          fi
