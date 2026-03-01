@@ -14,6 +14,10 @@ export async function generateImageMetadata() {
 	];
 }
 
+export async function generateStaticParams() {
+	return [{ __metadata_id__: "og-image" }];
+}
+
 export default async function Image() {
 	return new ImageResponse(
 		(
