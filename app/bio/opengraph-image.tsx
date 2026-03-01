@@ -2,6 +2,8 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "nodejs";
 export const contentType = "image/png";
+export const dynamic = "force-static";
+export const revalidate = 86400; // Cache for 24 hours
 
 export default async function Image() {
 	return new ImageResponse(

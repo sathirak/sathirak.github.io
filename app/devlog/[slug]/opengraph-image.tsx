@@ -3,6 +3,8 @@ import { getAllBlogPosts } from "@/modules/shared/utils/blog";
 
 export const runtime = "nodejs";
 export const contentType = "image/png";
+export const dynamic = "force-static";
+export const revalidate = 86400; // Cache for 24 hours
 
 // Generate OG images for each blog post
 export async function generateImageMetadata({ params }: { params: { slug: string } }) {
