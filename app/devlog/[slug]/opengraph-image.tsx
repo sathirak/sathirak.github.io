@@ -84,7 +84,6 @@ export default async function Image({ params }: { params: { slug: string } }) {
 					fontFamily: "system-ui",
 					padding: "60px",
 					flexDirection: "column",
-					gap: "20px",
 				}}
 			>
 				<div
@@ -94,6 +93,7 @@ export default async function Image({ params }: { params: { slug: string } }) {
 						textAlign: "center",
 						lineHeight: 1.2,
 						maxWidth: "90%",
+						margin: "0 auto",
 					}}
 				>
 					{post.title}
@@ -103,6 +103,7 @@ export default async function Image({ params }: { params: { slug: string } }) {
 						fontSize: 28,
 						opacity: 0.9,
 						textAlign: "center",
+						marginTop: "30px",
 					}}
 				>
 					{formattedDate} • {post.readingTimeMinutes} min read
