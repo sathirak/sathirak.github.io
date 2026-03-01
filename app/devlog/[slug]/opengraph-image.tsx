@@ -79,34 +79,40 @@ export default async function Image({ params }: { params: { slug: string } }) {
 					width: "100%",
 					height: "100%",
 					display: "flex",
-					flexDirection: "column",
 					alignItems: "center",
 					justifyContent: "center",
 					color: "white",
 					fontWeight: "bold",
 					fontFamily: "system-ui",
 					padding: "60px",
-					textAlign: "center",
 				}}
 			>
 				<div
 					style={{
-						fontSize: 56,
-						marginBottom: 30,
-						lineHeight: 1.2,
+						textAlign: "center",
+						display: "flex",
+						flexDirection: "column",
+						gap: "30px",
 						maxWidth: "90%",
 					}}
 				>
-					{post.title}
-				</div>
-				<div
-					style={{
-						fontSize: 32,
-						opacity: 0.9,
-						color: "rgba(255, 255, 255, 0.8)",
-					}}
-				>
-					{formattedDate} • {post.readingTimeMinutes} min read
+					<div
+						style={{
+							fontSize: 56,
+							lineHeight: 1.2,
+						}}
+					>
+						{post.title}
+					</div>
+					<div
+						style={{
+							fontSize: 32,
+							opacity: 0.9,
+							color: "rgba(255, 255, 255, 0.8)",
+						}}
+					>
+						{formattedDate} • {post.readingTimeMinutes} min read
+					</div>
 				</div>
 			</div>
 		),
