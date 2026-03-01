@@ -3,7 +3,16 @@ import { ImageResponse } from "next/og";
 export const runtime = "nodejs";
 export const contentType = "image/png";
 export const dynamic = "force-static";
-export const revalidate = 86400; // Cache for 24 hours
+
+export async function generateImageMetadata() {
+	return [
+		{
+			id: "og-image",
+			size: { width: 1200, height: 630 },
+			type: "image/png",
+		},
+	];
+}
 
 export default async function Image() {
 	return new ImageResponse(

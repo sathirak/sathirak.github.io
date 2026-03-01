@@ -2,7 +2,6 @@ import type { MetadataRoute } from "next";
 import { getAllBlogPosts } from "@/modules/shared/utils/blog";
 
 export const dynamic = "force-static";
-export const revalidate = 3600; // Revalidate every hour
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	// Get all blog posts

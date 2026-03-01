@@ -4,7 +4,6 @@ import { getAllBlogPosts, getPublishedSlugs } from "@/modules/shared/utils/blog"
 export const runtime = "nodejs";
 export const contentType = "image/png";
 export const dynamic = "force-static";
-export const revalidate = 86400; // Cache for 24 hours
 
 // Generate static params for all blog posts
 export async function generateStaticParams() {
