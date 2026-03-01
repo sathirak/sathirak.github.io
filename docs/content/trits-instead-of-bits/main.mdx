@@ -1,0 +1,150 @@
+export const metadata = {
+    slug: "trits-instead-of-bits",
+    title: "Trits, instead of Bits",
+    description: "Using ternary logic in computers instead of binary",
+    date: "2026-03-01",
+};
+
+import { Table, THead, TBody, TR, TH, TD } from "@/modules/mdx/inline/table";
+
+<Abstract>
+This experiment explores ternary computing through the implementation of a balanced ternary CPU emulator, the Eris BST-27i. By replacing binary logic with balanced ternary $\{-1, 0, 1\}$, we demonstrate that ternary architectures offer significant advantages in information density, dynamic range, and inherent support for signed integers without additional sign bits. We analyze the architectural implications of ternary systems, including register design, address space organization, and ALU implementation, and present a quantitative comparison with the RV32I RISC-V architecture.
+
+[https://github.com/sathirak/eris-bst-27i](https://github.com/sathirak/eris-bst-27i)
+</Abstract>
+
+Bits have been the foundation of computing since its inception. They're elegant in their simplicity: $0\text{V}$ for logical $0$ and $\sim3.3\text{V}$ for logical $1$. This binary representation propagates through wires, integrates into logical circuits, and operates within doped silicon. But what if we expanded to $3$, $4$, or even $5$ voltage levels instead of just $2$? What would fundamentally change?
+
+## Introduction to Trits
+
+Trits have not been extensively explored in computing research. There's minimal documentation and very few studies focusing on ternary computing. The reasoning is simple: we have more than 80 years of binary computer architecture, and we're not comfortable moving away from it.
+
+Yet studies have been done regardless. For example, the **Setun** from 67 years ago—a [computer based on trits](https://en.wikipedia.org/wiki/Setun). However, it was not widely adopted afterward.
+
+## Balanced Ternary
+
+For [this experiment](https://github.com/sathirak/eris-bst-27i), I used a **balanced trit** system. Instead of using $(0,1)$ like in binary or $(0,1,2)$ in standard ternary, I used $(-1, 0, 1)$, or more commonly notated as $(T, 0, 1)$ where $T$ represents "trit negative".
+
+This balanced representation has interesting mathematical properties that make certain operations more elegant than in binary.
+
+## The Experiment
+
+The [Eris BST-27i project](https://github.com/sathirak/eris-bst-27i) demonstrates a ternary CPU emulator in practice.
+
+The experiment's goal was to create a complex CPU emulator comprising all the notable components:
+
+- **Control Unit (CU)**
+- **Arithmetic Logic Unit (ALU)**
+- **Address space**
+- **Registers**
+
+All built on the foundation of the balanced trit.
+
+Changing the foundation of computing means we need to go deeper—precisely to the CPU level. Imagine that we've figured out a way to store and pass trits through our CPU. But nearly everything in a CPU depends on bits:
+
+- **Registers** - How do we store ternary values?
+- **Memory** - What does addressing look like in base-3?
+- **ALU** - How do arithmetic operations work?
+- **Instruction Set** - How do we encode operations?
+
+## Defining the Tryte
+
+This experimental CPU uses an architecture similar to RISC-V, specifically the RV32I, and we need to define a **tryte** for the CPU. Since the tryte has been defined in many different ways, I chose the most consistent representation: **27 trits per tryte**.
+
+This choice maintains consistency with the power-of-base pattern:
+
+- Binary: $2^3 = 8$ bits per byte
+- Ternary: $3^3 = 27$ trits per tryte
+
+## Defining Components
+
+**General Purpose Registers**: The ternary system uses 27 GPRs (3³) instead of the standard 32 found in RV32I. See the [register implementation](https://github.com/sathirak/eris-bst-27i/blob/main/src/core/registers.rs) for details.
+
+**Address Space**: The system is tryte-addressable, with each address storing a tryte in memory. This yields approximately 7.6 trillion distinct addresses, compared to 4 billion in 32-bit systems. Refer to the [address space implementation](https://github.com/sathirak/eris-bst-27i/blob/main/src/core/address_space.rs).
+
+**Instruction Set**: The ISA follows the RV32I RISC-V pattern, ensuring consistency with established processor design principles. See the [instruction set implementation](https://github.com/sathirak/eris-bst-27i/blob/main/src/arch/instructions.rs) for complete details.
+
+## The ALU
+
+Apart from other components that were completely redesigned from scratch, the ALU required a full reimplementation. The only surviving elements are its name and overall control flow.
+
+The ternary ALU requires fewer circuits than its binary counterpart. In the Eris BST-27i, we only needed:
+
+- A `min` circuit (for minimum/comparison operations)
+- A `full trit adder`
+
+In contrast, binary architectures require `and`, `or`, `add`, `sub`, and many other gates. This is one of the elegant aspects of ternary computing: the reduced complexity in fundamental operations makes the architecture simpler to understand and reason about.
+
+You can compare the Eris BST-27i implementation with the [RISC-V emulator](https://github.com/sathirak/risc-v-emu), which uses the same RV32I architecture. Though coding styles may differ, the architectural patterns remain consistent, enabling direct comparison of ternary versus binary design choices.
+
+## Comparative Analysis
+
+The following table summarizes key architectural metrics:
+
+<Table>
+  <THead>
+    <TR>
+      <TH>Feature</TH>
+      <TH>Eris BST-27i (Ternary)</TH>
+      <TH>RV32I (Binary)</TH>
+    </TR>
+  </THead>
+  <TBody>
+    <TR>
+      <TD>Logic</TD>
+      <TD>Balanced Ternary: {'{-1, 0, 1}'}</TD>
+      <TD>Binary: {'{0, 1}'}</TD>
+    </TR>
+    <TR>
+      <TD>Word Width</TD>
+      <TD>27 Trits</TD>
+      <TD>32 Bits</TD>
+    </TR>
+    <TR>
+      <TD>GPR Count</TD>
+      <TD>27 General Purpose Registers</TD>
+      <TD>32 Registers</TD>
+    </TR>
+    <TR>
+      <TD>States per Word</TD>
+      <TD>$3^{{27}}$ ≈ 7.6 × 10<sup>12</sup></TD>
+      <TD>$2^{{32}}$ ≈ 4.3 × 10<sup>9</sup></TD>
+    </TR>
+    <TR>
+      <TD>Dynamic Range</TD>
+      <TD>±3,812,798,742,493</TD>
+      <TD>±2,147,483,648</TD>
+    </TR>
+    <TR>
+      <TD>Address Space</TD>
+      <TD>7.6 TB (Trit-addressable)</TD>
+      <TD>4 GB (Byte-addressable)</TD>
+    </TR>
+    <TR>
+      <TD>Memory Ratio</TD>
+      <TD colSpan={2}>≈ 1,789× larger address space</TD>
+    </TR>
+  </TBody>
+</Table>
+
+## Advantages of Ternary Computing
+
+### Native Signed Integer Support
+
+Balanced ternary naturally represents negative integers without requiring separate sign bits or two's complement encoding. This simplifies arithmetic logic and reduces circuit complexity compared to binary systems.
+
+### Information Density
+
+A single trit carries $\log_2(3) \approx 1.585$ bits of information, providing approximately 58.5% more information density per unit than binary logic. Over $n$ positions, ternary systems represent $3^n$ states versus binary's $2^n$ states.
+
+### Extended Dynamic Range
+
+With balanced ternary representation using 27 trits, the dynamic range is $\pm 3,812,798,742,493$, approximately **1,776 times** greater than RV32I's $\pm 2,147,483,648$, despite using only a marginally smaller word width ($27$ trits vs $32$ bits).
+
+### Massive Address Space
+
+The address space of $3^{27}$ addresses provides approximately **1,789 times** more addressable memory than a 32-bit system ($7.6$ TB vs $4$ GB), enabling access to vastly larger datasets without address translation mechanisms.
+
+### Simplified ALU Design
+
+Ternary ALUs require fewer fundamental gates. The Eris BST-27i uses only a `min` circuit and a `full trit adder`, whereas binary ALUs require `and`, `or`, `add`, `subtract`, and numerous other gates. This reduction directly translates to lower silicon area, reduced power consumption, and fewer potential failure points.
