@@ -73,7 +73,6 @@ export default async function Image({ params }: { params: { slug: string } }) {
 		(
 			<div
 				style={{
-					fontSize: 64,
 					background:
 						"linear-gradient(135deg, #14b8a6 0%, #f97316 50%, #eab308 100%)",
 					width: "100%",
@@ -82,37 +81,31 @@ export default async function Image({ params }: { params: { slug: string } }) {
 					alignItems: "center",
 					justifyContent: "center",
 					color: "white",
-					fontWeight: "bold",
 					fontFamily: "system-ui",
 					padding: "60px",
+					flexDirection: "column",
+					gap: "20px",
 				}}
 			>
 				<div
 					style={{
+						fontSize: 56,
+						fontWeight: "bold",
 						textAlign: "center",
-						display: "flex",
-						flexDirection: "column",
-						gap: "30px",
+						lineHeight: 1.2,
 						maxWidth: "90%",
 					}}
 				>
-					<div
-						style={{
-							fontSize: 56,
-							lineHeight: 1.2,
-						}}
-					>
-						{post.title}
-					</div>
-					<div
-						style={{
-							fontSize: 32,
-							opacity: 0.9,
-							color: "rgba(255, 255, 255, 0.8)",
-						}}
-					>
-						{formattedDate} • {post.readingTimeMinutes} min read
-					</div>
+					{post.title}
+				</div>
+				<div
+					style={{
+						fontSize: 28,
+						opacity: 0.9,
+						textAlign: "center",
+					}}
+				>
+					{formattedDate} • {post.readingTimeMinutes} min read
 				</div>
 			</div>
 		),
