@@ -1,15 +1,11 @@
 import type { TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from "react";
 
-const tableStyle = {
-	borderCollapse: 'collapse' as const,
-	width: '100%',
-	margin: '1rem 0',
-};
-
 const cellStyle = {
 	border: '1px solid #d1d5db',
-	padding: '0.75rem 1rem',
+	padding: '0.55rem 0.7rem',
 	textAlign: 'left' as const,
+	verticalAlign: 'top' as const,
+	overflowWrap: 'anywhere' as const,
 };
 
 const headerCellStyle = {
@@ -17,8 +13,23 @@ const headerCellStyle = {
 	fontWeight: '600' as const,
 };
 
-export const Table = (props: TableHTMLAttributes<HTMLTableElement>) => (
-	<table style={tableStyle} {...props} />
+export const Table = ({ children, ...props }: TableHTMLAttributes<HTMLTableElement>) => (
+	<div
+		className="my-6 w-full max-w-full overflow-x-auto rounded-md"
+		style={{ WebkitOverflowScrolling: 'touch' }}
+	>
+		<table
+			style={{
+				borderCollapse: 'collapse',
+				width: '100%',
+				minWidth: '560px',
+				fontSize: '0.95rem',
+			}}
+			{...props}
+		>
+			{children}
+		</table>
+	</div>
 );
 
 export const THead = (props: TableHTMLAttributes<HTMLTableSectionElement>) => (
