@@ -6,6 +6,18 @@ export const ScrollGuide: React.FC = () => {
 	const guideRef = useRef<HTMLDivElement>(null);
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [pageHeight, setPageHeight] = useState(0);
+	const [isDesktop, setIsDesktop] = useState(false);
+
+	useEffect(() => {
+		const updateViewport = () => {
+			setIsDesktop(window.innerWidth >= 1024);
+		};
+
+		updateViewport();
+		window.addEventListener("resize", updateViewport);
+
+		return () => window.removeEventListener("resize", updateViewport);
+	}, []);
 
 	// Calculate page height and update on resize
 	useEffect(() => {
@@ -90,7 +102,7 @@ export const ScrollGuide: React.FC = () => {
 	}, [activeIndex]);
 
 	// Don't render if page height not calculated yet
-	if (pageHeight === 0) return null;
+	if (pageHeight === 0 || !isDesktop) return null;
 
 	return (
 		<div

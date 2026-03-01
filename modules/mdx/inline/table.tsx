@@ -1,13 +1,14 @@
 import type { TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from "react";
 
 const cellStyle = {
-	border: '1px solid #d1d5db',
+	border: '1px solid #d8d8d8f4',
 	padding: '0.5rem 0.6rem',
 	textAlign: 'left' as const,
 	verticalAlign: 'top' as const,
 	overflowWrap: 'anywhere' as const,
 	wordBreak: 'break-word' as const,
 	whiteSpace: 'normal' as const,
+	boxSizing: 'border-box' as const,
 };
 
 const headerCellStyle = {
@@ -17,21 +18,27 @@ const headerCellStyle = {
 
 export const Table = ({ children, ...props }: TableHTMLAttributes<HTMLTableElement>) => (
 	<div
-		className="my-6 w-full max-w-full overflow-x-auto rounded-md"
-		style={{ WebkitOverflowScrolling: 'touch' }}
+		className="my-6 w-full min-w-0 overflow-hidden"
+		style={{ maxWidth: 'calc(100vw - 3rem)' }}
 	>
-		<table
-			style={{
-				borderCollapse: 'collapse',
-				width: '100%',
-				maxWidth: '100%',
-				tableLayout: 'fixed',
-				fontSize: '0.88rem',
-			}}
-			{...props}
+		<div
+			className="w-full min-w-0 overflow-x-auto overflow-y-hidden"
+			style={{ WebkitOverflowScrolling: 'touch', maxWidth: '100%' }}
 		>
-			{children}
-		</table>
+			<table
+				style={{
+					borderCollapse: 'collapse',
+					width: 'max-content',
+					minWidth: '100%',
+					maxWidth: '100%',
+					tableLayout: 'auto',
+					fontSize: '0.88rem',
+				}}
+				{...props}
+			>
+				{children}
+			</table>
+		</div>
 	</div>
 );
 
