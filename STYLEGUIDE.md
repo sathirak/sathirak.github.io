@@ -18,6 +18,8 @@
 10. [Adding New Features](#adding-new-features)
 11. [Color Reference](#color-reference)
 12. [Spacing & Layout](#spacing--layout)
+13. [Error Pages](#error-pages)
+14. [Build & Deployment](#build--deployment)
 
 ---
 
@@ -725,6 +727,88 @@ className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"  // Responsive grid
 
 ---
 
+## Error Pages
+
+### Philosophy: Minimal & Elegant
+
+Error pages are kept intentionally **simple and minimal**. They display only the error code with the brand gradient, nothing else. This follows the principle of "the error page itself shouldn't have errors."
+
+### 404 Not Found
+
+**File**: `app/not-found.tsx`
+
+```tsx
+export default function NotFound() {
+	return (
+		<main className="flex items-center justify-center min-h-screen">
+			<h1 className="text-9xl font-bold bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-tertiary text-transparent bg-clip-text">
+				404
+			</h1>
+		</main>
+	);
+}
+```
+
+### 500 Server Error
+
+**File**: `app/error.tsx`
+
+```tsx
+"use client";
+
+export default function Error() {
+	return (
+		<main className="flex items-center justify-center min-h-screen">
+			<h1 className="text-9xl font-bold bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-tertiary text-transparent bg-clip-text">
+				500
+			</h1>
+		</main>
+	);
+}
+```
+
+**Why minimal?**
+- Error pages are fallback UIs - users will navigate away quickly
+- Complex error pages can themselves fail, creating poor UX
+- The brand gradient provides visual consistency without complexity
+- Large error code is memorable and communicates the issue instantly
+
+---
+
+## Build & Deployment
+
+### GitHub Actions Workflow
+
+The project uses GitHub Actions to automatically build and deploy to a separate `production` branch.
+
+**Workflow file**: `.github/workflows/build-and-deploy.yml`
+
+**Process**:
+1. On every push to `main`, the workflow runs
+2. Installs dependencies with pnpm
+3. Builds the project with `pnpm run build`
+4. Commits the build artifacts (`docs/` folder) to the `production` branch
+5. Force-pushes to `production` branch (replaces entire branch with new build)
+
+**Why separate branches?**
+- `main` contains only source code - clean, minimal repo
+- `production` contains built artifacts - publicly served files
+- Clear separation of concerns: source vs. compiled output
+- GitHub Pages or CDN can point to `production` branch
+- Artifacts are never manually committed to `main`
+
+**Remote configuration**:
+- Repository: `git@github.com:sathirak/grotto.git`
+- Source branch: `main` (source code)
+- Production branch: `production` (built artifacts)
+
+**To deploy**:
+```bash
+git push origin main  # GitHub Actions automatically builds and deploys
+```
+
+---
+
 ## Final Notes
 
 ### Maintaining Consistency
@@ -757,5 +841,5 @@ If this guide doesn't cover your use case:
 ---
 
 **Last Updated**: March 2026
-**Next.js Version**: 16.1.6
+**Next.js Version**: 15.2.8
 **React Version**: 19.2.4
