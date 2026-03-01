@@ -83,30 +83,18 @@ export default async function Image({ params }: { params: { slug: string } }) {
 					color: "white",
 					fontFamily: "system-ui",
 					padding: "60px",
-					flexDirection: "column",
+					textAlign: "center",
 				}}
 			>
 				<div
 					style={{
 						fontSize: 56,
 						fontWeight: "bold",
-						textAlign: "center",
 						lineHeight: 1.2,
 						maxWidth: "90%",
-						margin: "0 auto",
 					}}
 				>
-					{post.title}
-				</div>
-				<div
-					style={{
-						fontSize: 28,
-						opacity: 0.9,
-						textAlign: "center",
-						marginTop: "30px",
-					}}
-				>
-					{formattedDate} • {post.readingTimeMinutes} min read
+					{post.title} • {formattedDate} • {post.readingTimeMinutes} min read
 				</div>
 			</div>
 		),
