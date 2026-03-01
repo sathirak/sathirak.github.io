@@ -1,10 +1,16 @@
 import { ImageResponse } from "next/og";
-import { getAllBlogPosts } from "@/modules/shared/utils/blog";
+import { getAllBlogPosts, getPublishedSlugs } from "@/modules/shared/utils/blog";
 
 export const runtime = "nodejs";
 export const contentType = "image/png";
 export const dynamic = "force-static";
 export const revalidate = 86400; // Cache for 24 hours
+
+// Generate static params for all blog posts
+export async function generateStaticParams() {
+	const slugs = await getPublishedSlugs();
+	return slugs.map((slug) => ({ slug }));
+}
 
 // Generate OG images for each blog post
 export async function generateImageMetadata({ params }: { params: { slug: string } }) {
