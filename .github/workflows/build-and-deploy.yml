@@ -36,26 +36,15 @@ jobs:
       - name: Build project
         run: pnpm run build
 
-      - name: Checkout production branch
-        run: git fetch origin production 2>/dev/null || echo "Production branch does not exist yet"
-
-      - name: Configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
       - name: Create or update production branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git checkout --orphan production-temp
-          git rm -rf .
-          cp -r docs/* .
+          cd docs
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           touch .nojekyll
-          git add .
-          if git diff --cached --quiet; then
-            echo "No changes to docs, skipping commit"
-          else
-            git commit -m "Build artifacts from main @ $(git rev-parse --short HEAD)"
-            git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git production-temp:production --force
-          fi
+          git add -A
+          git commit -m "Build artifacts from main @ $(git -C .. rev-parse --short HEAD)"
+          git push --force https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:production
