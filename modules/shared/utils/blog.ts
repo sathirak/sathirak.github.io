@@ -63,10 +63,13 @@ export async function getPublishedSlugs(): Promise<string[]> {
 						? new Date(metadata.date)
 						: new Date(stats.mtime);
 
+					const readingTimeMinutes = calculateReadingTime(content);
+
 					posts.push({
 						slug: folder.name,
 						title: metadata.title || folder.name,
 						date,
+						readingTimeMinutes,
 					});
 				}
 			} catch (error) {

@@ -20,6 +20,12 @@ export const Footer = () => {
 					>
 						LinkedIn
 					</a>
+					<a
+						href="/feed.xml"
+						className="hover:text-zinc-800 transition-colors"
+					>
+						RSS
+					</a>
 				</div>
 			</div>
 		</footer>
