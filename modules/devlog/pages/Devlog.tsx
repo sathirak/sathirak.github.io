@@ -9,6 +9,7 @@ interface Props {
 	slug: string;
 	title: string;
 	description: string;
+	readingTimeMinutes: number;
 }
 
 export const Devlog = (props: Props) => {
@@ -19,6 +20,7 @@ export const Devlog = (props: Props) => {
 				slug={props.slug}
 				title={props.title}
 				description={props.description}
+				readingTimeMinutes={props.readingTimeMinutes}
 			/>
 			<section
 				className={`w-full max-w-3xl px-6 sm:px-8 lg:px-10 my-8 text-base sm:text-lg leading-relaxed ${redHatText.className}`}

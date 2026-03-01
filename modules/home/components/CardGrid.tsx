@@ -1,33 +1,11 @@
 import { Card } from "@/modules/home/components/Card";
 import { getAllBlogPosts } from "@/modules/shared/utils/blog";
-import fs from "fs";
-import path from "path";
-
-/**
- * Estimate reading time based on word count
- * Assumes ~200 words per minute
- */
-function estimateReadTime(content: string): string {
-	const wordCount = content.split(/\s+/).length;
-	const minutes = Math.ceil(wordCount / 200);
-	return `${minutes} min read`;
-}
 
 export const CardGrid = async () => {
 	const posts = await getAllBlogPosts();
-	const contentDir = path.join(process.cwd(), "public/content");
 
 	const cardData = posts.map((post) => {
-		// Read the MDX file to estimate read time
-		const mdxPath = path.join(contentDir, post.slug, "main.mdx");
-		let readTime = "5 min read"; // default
-
-		try {
-			const content = fs.readFileSync(mdxPath, "utf-8");
-			readTime = estimateReadTime(content);
-		} catch {
-			// fallback to default if file can't be read
-		}
+		const readTime = post.readingTimeMinutes === 1 ? "1 min read" : `${post.readingTimeMinutes} min read`;
 
 		return {
 			title: post.title,

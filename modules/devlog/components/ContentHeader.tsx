@@ -8,6 +8,7 @@ interface Props {
 	slug: string;
 	title: string;
 	description: string;
+	readingTimeMinutes: number;
 }
 
 export const ContentHeader = (props: Props) => {
@@ -27,6 +28,8 @@ export const ContentHeader = (props: Props) => {
 		}
 	}, []);
 
+	const readTimeText = props.readingTimeMinutes === 1 ? "1 min read" : `${props.readingTimeMinutes} min read`;
+
 	return (
 		<section className="w-full max-w-5xl px-6 sm:px-8 lg:px-10 gap-6 my-8 lg:flex lg:items-start">
 			<div className="lg:w-1/2">
@@ -37,6 +40,9 @@ export const ContentHeader = (props: Props) => {
 					{props.title}
 				</h1>
 				<p className="text-xl sm:text-2xl text-zinc-700 mb-6">{props.description}</p>
+				<p className="text-sm sm:text-base text-zinc-600">
+					{readTimeText}
+				</p>
 			</div>
 
 			<img

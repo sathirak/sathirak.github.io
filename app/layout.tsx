@@ -3,6 +3,17 @@ import "./globals.css";
 import { Header } from "@/modules/layout/components/Header";
 import { Footer } from "@/modules/layout/components/Footer";
 import { GoogleTagManager } from "@next/third-parties/google";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+	title: "Sathira's Grotto",
+	description: "A blog about software, systems, and ideas",
+	alternates: {
+		types: {
+			"application/rss+xml": "https://sathirak.com/feed.xml",
+		},
+	},
+};
 
 export default function RootLayout({
 	children,
@@ -29,6 +40,12 @@ export default function RootLayout({
 				<link
 					rel="stylesheet"
 					href="https://cdn.jsdelivr.net/npm/katex@0.16.33/dist/katex.min.css"
+				/>
+				<link
+					rel="alternate"
+					type="application/rss+xml"
+					title="Sathira's Grotto"
+					href="/feed.xml"
 				/>
 			</head>
 			<GoogleTagManager gtmId="G-EVEP2QMLHF" />

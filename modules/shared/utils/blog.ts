@@ -10,6 +10,16 @@ export interface BlogPost {
 	slug: string;
 	title: string;
 	date: Date;
+	readingTimeMinutes: number;
+}
+
+/**
+ * Calculate reading time based on word count
+ * Assumes ~200 words per minute
+ */
+function calculateReadingTime(content: string): number {
+	const wordCount = content.split(/\s+/).length;
+	return Math.ceil(wordCount / 200);
 }
 
 /**
@@ -106,10 +116,13 @@ export async function getAllBlogPosts(): Promise<BlogPost[]> {
 						? new Date(metadata.date)
 						: new Date(stats.mtime);
 
+					const readingTimeMinutes = calculateReadingTime(content);
+
 					posts.push({
 						slug: folder.name,
 						title: metadata.title || folder.name,
 						date,
+						readingTimeMinutes,
 					});
 				}
 			} catch (error) {

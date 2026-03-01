@@ -1,5 +1,5 @@
 import { Devlog } from "@/modules/devlog/pages/Devlog";
-import { getPublishedSlugs } from "@/modules/shared/utils/blog";
+import { getPublishedSlugs, getAllBlogPosts } from "@/modules/shared/utils/blog";
 import type { Metadata, ResolvingMetadata } from "next/types";
 
 export const dynamicParams = false;
@@ -33,8 +33,14 @@ export default async function Page(props: Props) {
 	const { default: DevlogContent, ...metadata } = await import(
 		`@/public/content/${slug}/main.mdx`
 	);
+
+	// Get reading time from blog utility
+	const posts = await getAllBlogPosts();
+	const post = posts.find((p) => p.slug === slug);
+	const readingTimeMinutes = post?.readingTimeMinutes ?? 5;
+
 	return (
-		<Devlog slug={slug} {...metadata.metadata}>
+		<Devlog slug={slug} readingTimeMinutes={readingTimeMinutes} {...metadata.metadata}>
 			<DevlogContent />
 		</Devlog>
 	);
